@@ -3,6 +3,7 @@ const helmet = require("helmet");
 const cors = require("cors");
 const morgan = require("morgan");
 const cookieParser = require("cookie-parser");
+const path = require("path");
 
 const { corsOrigin, nodeEnv } = require("./config/env");
 const routes = require("./routes");
@@ -20,6 +21,9 @@ app.use(
 app.use(express.json({ limit: "1mb" }));
 app.use(cookieParser());
 app.use(morgan(nodeEnv === "production" ? "combined" : "dev"));
+
+// Serve static files (sitemap, robots.txt, etc.)
+app.use(express.static(path.join(__dirname, "../public")));
 
 app.get("/health", (req, res) => {
   res.json({ ok: true });

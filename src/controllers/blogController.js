@@ -4,6 +4,7 @@ const Blog = require("../models/Blog");
 const { asyncHandler } = require("../utils/asyncHandler");
 const { toSlug } = require("../utils/slug");
 const { invalidatePrefix } = require("../middlewares/cache");
+const { generateSitemap } = require("../utils/sitemapHelper");
 
 const createSchema = z.object({
   title: z.string().min(1),
@@ -67,6 +68,11 @@ const createBlog = asyncHandler(async (req, res) => {
 
   await invalidateBlogCache();
 
+  // Regenerate sitemap if blog is published
+  if (blog.status === "published") {
+    await generateSitemap();
+  }
+
   res.status(201).json({ blog });
 });
 
@@ -115,6 +121,8 @@ const updateBlog = asyncHandler(async (req, res) => {
     return res.status(404).json({ message: "Blog not found" });
   }
 
+  const wasPublished = blog.status === "published";
+
   if (data.title !== undefined) blog.title = data.title;
   if (data.slug !== undefined || data.title !== undefined) {
     const slugSource = data.slug || blog.title;
@@ -136,6 +144,11 @@ const updateBlog = asyncHandler(async (req, res) => {
   await blog.save();
   await invalidateBlogCache();
 
+  // Regenerate sitemap if blog is published or was published
+  if (blog.status === "published" || wasPublished) {
+    await generateSitemap();
+  }
+
   return res.json({ blog });
 });
 
@@ -145,6 +158,12 @@ const deleteBlog = asyncHandler(async (req, res) => {
     return res.status(404).json({ message: "Blog not found" });
   }
   await invalidateBlogCache();
+
+  // Regenerate sitemap if deleted blog was published
+  if (blog.status === "published") {
+    await generateSitemap();
+  }
+
   return res.json({ ok: true });
 });
 
