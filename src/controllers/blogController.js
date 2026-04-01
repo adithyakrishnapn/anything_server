@@ -114,6 +114,14 @@ const getBlogBySlug = asyncHandler(async (req, res) => {
   return res.json({ blog });
 });
 
+const getBlogById = asyncHandler(async (req, res) => {
+  const blog = await Blog.findById(req.params.id);
+  if (!blog) {
+    return res.status(404).json({ message: "Blog not found" });
+  }
+  return res.json({ blog });
+});
+
 const updateBlog = asyncHandler(async (req, res) => {
   const data = updateSchema.parse(req.body);
   const blog = await Blog.findById(req.params.id);
@@ -170,6 +178,7 @@ const deleteBlog = asyncHandler(async (req, res) => {
 module.exports = {
   createBlog,
   listBlogs,
+  getBlogById,
   getBlogBySlug,
   updateBlog,
   deleteBlog,

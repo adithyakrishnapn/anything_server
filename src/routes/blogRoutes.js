@@ -5,6 +5,7 @@ const { cache } = require("../middlewares/cache");
 const {
   createBlog,
   listBlogs,
+  getBlogById,
   getBlogBySlug,
   updateBlog,
   deleteBlog,
@@ -17,6 +18,11 @@ router.get(
   "/",
   cache((req) => `cache:blogs:${JSON.stringify(req.query)}`, 60),
   listBlogs
+);
+router.get(
+  "/id/:id",
+  cache((req) => `cache:blog:id:${req.params.id}`, 120),
+  getBlogById
 );
 router.get(
   "/:slug",
