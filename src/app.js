@@ -22,14 +22,14 @@ app.use(express.json({ limit: "1mb" }));
 app.use(cookieParser());
 app.use(morgan(nodeEnv === "production" ? "combined" : "dev"));
 
-// Serve static files (sitemap, robots.txt, etc.)
-app.use(express.static(path.join(__dirname, "../public")));
-
 app.get("/health", (req, res) => {
   res.json({ ok: true });
 });
 
 app.use("/", routes);
+
+// Serve static files (robots.txt, etc.) after dynamic routes
+app.use(express.static(path.join(__dirname, "../public")));
 
 app.use(errorHandler);
 
