@@ -6,7 +6,8 @@ const redisClient = createClient({
   password: redisPassword,
   socket: {
     host: redisHost,
-    port: Number(redisPort)
+    port: Number(redisPort),
+    tls;{}
   }
 });
 
